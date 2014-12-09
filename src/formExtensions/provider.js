@@ -100,17 +100,21 @@
 
         'below-field': function (formFieldElement, formName, formFieldName) {
 
+          var parent = formFieldElement.parent();
+		  var parentParent = parent.parent();
           var msgElement = angular.element(stringFormat('<div aa-val-msg-for="{0}.{1}"></div>', formName, formFieldName));
           var fieldType = formFieldElement[0].type;
           fieldType = fieldType ? fieldType.toLowerCase() : 'text';
-
-          if (fieldType === 'radio') {
-            //radios tend to be wrapped, go up a few levels (of course you can customize this with your own strategy)
-            formFieldElement.parent().parent().append(msgElement);
-
-          } else {
-            formFieldElement.after(msgElement);
-          }
+		  
+          switch (true){
+			case fieldType === 'radio' || (parent.hasClass('input-group') && parentParent.hasClass('form-group')):
+				//radios tend to be wrapped, go up a few levels (of course you can customize this with your own strategy)
+				// if you do a bootstrap form-group with an input-group inside, the val message needs to go outside the input-group
+				parentParent.append(msgElement);
+				break;
+			default:
+				formFieldElement.after(msgElement);
+		  }
 
           return msgElement;
         },
